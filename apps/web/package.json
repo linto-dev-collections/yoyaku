@@ -1,0 +1,39 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3001",
+    "build": "next build",
+    "check-types": "next typegen && tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@stripe/react-stripe-js": "^3.5.0",
+    "@stripe/stripe-js": "^5.6.0",
+    "@yoyaku/env": "workspace:*",
+    "@yoyaku/server": "workspace:*",
+    "@yoyaku/ui": "workspace:*",
+    "better-auth": "catalog:",
+    "hono": "catalog:",
+    "next": "catalog:",
+    "next-themes": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "@opennextjs/cloudflare": "catalog:",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^22.13.14",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@yoyaku/config": "workspace:*",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "^4.1.8",
+    "wrangler": "catalog:"
+  }
+}

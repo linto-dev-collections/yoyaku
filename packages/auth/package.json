@@ -1,0 +1,22 @@
+{
+  "name": "@yoyaku/auth",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./permissions": "./src/permissions.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@yoyaku/db": "workspace:*",
+    "@yoyaku/env": "workspace:*",
+    "better-auth": "catalog:",
+    "drizzle-orm": "catalog:"
+  },
+  "devDependencies": {
+    "@yoyaku/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

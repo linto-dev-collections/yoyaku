@@ -1,0 +1,26 @@
+{
+  "name": "@yoyaku/db",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts",
+    "./schema/*": "./src/schema/*.ts"
+  },
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@yoyaku/env": "workspace:*",
+    "drizzle-orm": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.19",
+    "@yoyaku/config": "workspace:*",
+    "dotenv": "^17.2.2",
+    "drizzle-kit": "catalog:",
+    "typescript": "catalog:"
+  }
+}

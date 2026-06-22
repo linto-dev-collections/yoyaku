@@ -1,0 +1,22 @@
+{
+  "extends": "@yoyaku/config/tsconfig.base.json",
+  // ルートは解決のみのソリューション tsconfig（files:[]＝ここでは何もコンパイルしない）。
+  // dependency-cruiser はこの tsconfig で paths を解決するため、apps/web の `@/*` エイリアスを
+  // ここに定義しないと page.tsx→`@/lib/*` の incoming エッジが不可視になり、純粋な葉モジュール
+  // （lib/risk・lib/http）が no-orphans で偽陽性になる。各 package/app の build 用 tsconfig には影響しない。
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./apps/web/src/*"]
+    }
+  },
+  "files": [],
+  "references": [
+    { "path": "packages/ui" },
+    { "path": "packages/db" },
+    { "path": "packages/event-store" },
+    { "path": "packages/domain" },
+    { "path": "packages/auth" },
+    { "path": "packages/env" },
+    { "path": "packages/shared" }
+  ]
+}

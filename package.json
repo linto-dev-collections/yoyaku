@@ -1,0 +1,38 @@
+{
+  "name": "yoyaku",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo -F @yoyaku/infra dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:web": "turbo -F web dev",
+    "db:auth:generate": "npx auth@latest generate --config packages/auth/src/index.ts --output packages/db/src/schema/auth.ts -y && biome format --write packages/db/src/schema/auth.ts",
+    "db:generate": "turbo -F @yoyaku/db db:generate",
+    "db:push": "turbo -F @yoyaku/db db:push",
+    "es:generate": "turbo -F @yoyaku/event-store es:generate",
+    "deploy": "turbo -F @yoyaku/infra deploy",
+    "destroy": "turbo -F @yoyaku/infra destroy",
+    "check": "biome check --write .",
+    "check:ci": "biome ci .",
+    "knip": "knip",
+    "depcruise": "depcruise packages apps --config .dependency-cruiser.cjs",
+    "test": "turbo test",
+    "verify": "pnpm knip && pnpm check && pnpm check-types && pnpm depcruise && pnpm test"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.0",
+    "@cloudflare/workers-types": "catalog:",
+    "@types/node": "^22.13.14",
+    "@yoyaku/config": "workspace:*",
+    "dependency-cruiser": "^17.4.3",
+    "knip": "^6.0.5",
+    "turbo": "^2.8.12",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@10.23.0"
+}

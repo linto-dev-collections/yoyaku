@@ -1,0 +1,23 @@
+{
+  "name": "@yoyaku/infra",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./alchemy.run": "./alchemy.run.ts"
+  },
+  "scripts": {
+    "dev": "alchemy dev",
+    "deploy": "ALCHEMY_DEPLOY=1 alchemy deploy",
+    "destroy": "alchemy destroy",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.19",
+    "@yoyaku/config": "workspace:*",
+    "alchemy": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "exclude": ["exports", "types"],
+  "workspaces": {
+    "apps/web": {
+      "entry": ["open-next.config.ts", "src/app/**/{page,layout,route}.tsx"],
+      "ignoreDependencies": ["tailwindcss"]
+    },
+    "apps/server": {
+      "ignoreDependencies": ["better-auth", "alchemy", "wrangler", "cloudflare"]
+    },
+    "packages/env": {
+      "ignoreDependencies": ["cloudflare"]
+    },
+    "packages/ui": { "entry": ["src/**/*.{ts,tsx}"] }
+  }
+}

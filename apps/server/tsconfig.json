@@ -1,0 +1,8 @@
+{
+  "extends": "@yoyaku/config/tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["src"]
+}

@@ -1,0 +1,122 @@
+name: CI / Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    # @yoyaku/env/web の必須 NEXT_PUBLIC_* は web の各コンポーネントが import した時点
+    # （= next build / next typegen の評価時）に schema.parse で検証される。
+    # Repository Variables が未設定の PR ビルドでも CI が落ちないよう、ビルド可能な
+    # フォールバック値を与える（実値は deploy job の Variables/Secrets から供給される）。
+    # NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY は `pk_` プレフィックス必須（web.ts の zod 検証）。
+    env:
+      NEXT_PUBLIC_SERVER_URL: ${{ vars.NEXT_PUBLIC_SERVER_URL || 'https://yoyaku-api.example.com' }}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder' }}
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA' }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (Biome)
+        run: pnpm check:ci
+
+      - name: Check unused exports (Knip)
+        run: pnpm knip
+
+      - name: Type check
+        run: pnpm check-types
+
+      - name: Check import boundaries (dependency-cruiser)
+        run: pnpm depcruise
+
+      - name: Test (Vitest)
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  deploy:
+    # CI 合格を必須にする（型エラー / lint 失敗時の誤 deploy を防ぐ）。
+    # PR では deploy job は走らない（if 条件で main への push のみに限定）。
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    concurrency:
+      group: deploy-${{ github.ref }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy
+        run: pnpm run deploy
+        env:
+          # --- Alchemy ---
+          ALCHEMY_DEPLOY: "1"
+          ALCHEMY_STAGE: prod
+          ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
+          ALCHEMY_STATE_TOKEN: ${{ secrets.ALCHEMY_STATE_TOKEN }}
+
+          # --- Cloudflare ---
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+          # --- App config（非機密・Variables）---
+          CORS_ORIGIN: ${{ vars.CORS_ORIGIN }}
+          BETTER_AUTH_URL: ${{ vars.BETTER_AUTH_URL }}
+          NEXT_PUBLIC_SERVER_URL: ${{ vars.NEXT_PUBLIC_SERVER_URL }}
+          GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+          STRIPE_CONNECT_COUNTRY: ${{ vars.STRIPE_CONNECT_COUNTRY }}
+          # Stripe publishable / Turnstile site key はいずれも公開値（ブラウザに露出）。
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+
+          # --- App secrets ---
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          # Better Auth Google Sign-in（scope: openid email profile）。
+          # redirect URI は Better Auth 既定の `${BETTER_AUTH_URL}/api/auth/callback/google`。
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          # Stripe webhook は2系統: snapshot（v1 PaymentIntent）と thin（Accounts v2 / Connect）。
+          STRIPE_WEBHOOK_SNAPSHOT_SECRET: ${{ secrets.STRIPE_WEBHOOK_SNAPSHOT_SECRET }}
+          STRIPE_WEBHOOK_THIN_SECRET: ${{ secrets.STRIPE_WEBHOOK_THIN_SECRET }}
+          # Turnstile siteverify 秘密鍵（high_risk 公演のみ発動・FR-17）。
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          # 運用/管理エンドポイント（X-Admin-Token）の認可トークン。
+          ADMIN_API_TOKEN: ${{ secrets.ADMIN_API_TOKEN }}

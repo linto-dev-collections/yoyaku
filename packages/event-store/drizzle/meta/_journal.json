@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1780673833437,
+      "tag": "0000_omniscient_whirlwind",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1780682634135,
+      "tag": "0001_milky_fantastic_four",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1781019324350,
+      "tag": "0002_fantastic_jane_foster",
+      "breakpoints": true
+    }
+  ]
+}

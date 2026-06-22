@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1780674599230,
+      "tag": "0000_high_doctor_spectrum",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1780715991047,
+      "tag": "0001_workable_ultimo",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1781480220190,
+      "tag": "0002_shocking_hobgoblin",
+      "breakpoints": true
+    }
+  ]
+}
