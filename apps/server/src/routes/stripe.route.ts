@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import Stripe from "stripe";
 import type { ReservationStub } from "../durable-objects/_shared/rpc";
-import { createStripe } from "../infrastructure/stripe/client";
+import { createStripe, createStripeV2 } from "../infrastructure/stripe/client";
 import { syncConnectAccount } from "../lib/connect";
 import type { AppEnv, Bindings } from "../types";
 
@@ -65,7 +65,9 @@ export const stripeRoute = new Hono<AppEnv>()
     const sig = c.req.header("stripe-signature");
     if (!sig) return c.json({ error: "missing_signature" }, 400);
     const body = await c.req.text();
-    const stripe = createStripe(c.env.STRIPE_SECRET_KEY);
+    // thin（Accounts v2 / Connect）は v2 preview API を叩くため preview 版クライアントを使う。
+    // 署名検証（parseEventNotificationAsync）は API 版非依存なので影響なし。
+    const stripe = createStripeV2(c.env.STRIPE_SECRET_KEY);
 
     let event: ThinEvent;
     try {

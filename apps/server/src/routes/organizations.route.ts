@@ -1,7 +1,7 @@
 import { DomainError } from "@yoyaku/domain";
 import { Hono } from "hono";
 import type Stripe from "stripe";
-import { createStripe } from "../infrastructure/stripe/client";
+import { createStripeV2 } from "../infrastructure/stripe/client";
 import { getConnectAccount, upsertConnectAccount } from "../lib/connect";
 import { requireOrgRole } from "../middleware/rbac";
 import type { AppEnv } from "../types";
@@ -138,7 +138,7 @@ export const organizationsRoute = new Hono<AppEnv>()
         });
       }
 
-      const stripe = createStripe(c.env.STRIPE_SECRET_KEY);
+      const stripe = createStripeV2(c.env.STRIPE_SECRET_KEY);
       const account = await retrieveV2Account(
         stripe,
         existing.stripeConnectAccountId,
@@ -162,7 +162,7 @@ export const organizationsRoute = new Hono<AppEnv>()
       if (!user) return c.json({ error: "unauthorized" }, 401);
 
       const organizationId = c.req.param("id");
-      const stripe = createStripe(c.env.STRIPE_SECRET_KEY);
+      const stripe = createStripeV2(c.env.STRIPE_SECRET_KEY);
       const country = c.env.STRIPE_CONNECT_COUNTRY;
 
       // Accounts v2 の recipient account を作成/利用する。
