@@ -22,6 +22,7 @@
     "es:generate": { "cache": false },
     "deploy": {
       "cache": false,
+      "dependsOn": ["@yoyaku/server#build"],
       "passThroughEnv": [
         "ALCHEMY_DEPLOY",
         "ALCHEMY_STAGE",
