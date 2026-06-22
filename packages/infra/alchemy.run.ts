@@ -51,8 +51,11 @@ const app = await alchemy("yoyaku", {
 });
 
 // ── 読み取り側: D1（read model + 認証）。マイグレーションは Alchemy が適用 ──
+// adopt: deploy が途中失敗して「物理 D1 は作成済みだが Alchemy state には未記録」になった場合でも、
+// 再実行時に "database already exists" で落ちず既存 D1 を採用して再開する（冪等な再デプロイ）。
 const db = await D1Database("database", {
   migrationsDir: "../../packages/db/src/migrations",
+  adopt: true,
 });
 
 // ── 書き込み側: イベントストア（Durable Objects 内 SQLite。集約=1 DO） ──
